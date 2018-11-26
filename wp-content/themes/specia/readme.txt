@@ -3,10 +3,10 @@
 Contributors: specia
 Requires at least: WordPress 4.4
 Tested up to: WordPress 4.9.8
-Stable tag: 2.2.70
-Version: 2.2.70
-License: GPLv2 or later
-License URI: http://www.gnu.org/licenses/gpl-2.0.html
+Stable tag: 2.2.71
+Version: 2.2.71
+License: GPLv3 or later
+License URI: https://www.gnu.org/licenses/gpl-3.0.html
 Tags: one-column, two-columns, left-sidebar, right-sidebar, flexible-header, custom-background, custom-colors, custom-header, custom-menu,  custom-logo, featured-image-header, featured-images, footer-widgets, full-width-template, sticky-post, theme-options, threaded-comments, translation-ready, blog, e-commerce, portfolio, editor-style, grid-layout
 
 Specia WordPress Theme, Copyright 2018 Specia Theme
@@ -88,6 +88,9 @@ License: CC0 Public Domain
 
 
 == Changelog ==
+@version 2.2.71
+* License Info Changed.
+
 @version 2.2.70
 * Theme Tags Changed.
 

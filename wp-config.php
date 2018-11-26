@@ -90,3 +90,6 @@ if ( !defined('ABSPATH') )
 
 /** Sets up WordPress vars and included files. */
 require_once(ABSPATH . 'wp-settings.php');
+
+// define('WP_HOME','https://wp-v1-medrom4.c9users.io');
+// define('WP_SITEURL','https://wp-v1-medrom4.c9users.io');
