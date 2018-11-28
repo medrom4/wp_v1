@@ -4,7 +4,7 @@ Tags: slider, wordpress slider, image slider, layer slider, responsive slider, s
 Donate link: https://sites.fastspring.com/nextend/product/smartslider3donate
 Requires at least: 4.6
 Tested up to: 5.0
-Stable tag: 3.3.10
+Stable tag: 3.3.11
 Requires PHP: 5.4
 License: GPLv3 or later
 License URI: http://www.gnu.org/licenses/gpl-3.0.html
@@ -195,6 +195,13 @@ Of course! Smart Slider use protocol relative urls which works fine on http:// a
 9. Layer slider with layers styles. Made with FREE version.
 
 == Changelog ==
+
+= 3.3.11 - 22. November 2018. =
+* Feature: SVG and WEBP image format support
+* Fix: Links will be able to contain || characters
+* Fix: Android Samsung internet browser fix for full page
+* Fix: Include additional CSS files in prerender iframes (fix for page builder frontend view)
+* Fix: If Load this slider after option is used, but the parent slider doesn't exists (like it is turned off for certain devices), your slider will still load.
 
 = 3.3.10 - 12. November 2018. =
 * Feature: Filters for WordPress post generators

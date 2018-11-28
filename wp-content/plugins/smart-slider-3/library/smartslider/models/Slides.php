@@ -282,9 +282,21 @@ class N2SmartsliderSlidesModel extends N2Model {
             )
         ));
 
-        $link = new N2ElementMixed($settings, 'link', n2_('Link'), '|*|_self');
-        new N2ElementUrl($link, 'link-1', n2_('Link'));
-        new N2ElementLinkTarget($link, 'link-2', n2_('Target window'));
+        $linkV1 = $form->getIfEmpty('link', '');
+        if (!empty($linkV1)) {
+            list($link, $target) = array_pad((array)N2Parse::parse($linkV1), 2, '');
+            $form->un_set('link');
+            $form->set('href', $link);
+            $form->set('href-target', $target);
+        }
+
+        if (!$this->slider->isStaticEdited || (!isset($data['static-slide']) || $data['static-slide'] != 1)) {
+            $link = new N2ElementGroup($settings, 'link', n2_('Link'));
+            new N2ElementUrl($link, 'href', n2_('Link'), '', array(
+                'style' => 'width:236px;'
+            ));
+            new N2ElementLinkTarget($link, 'href-target', n2_('Target window'));
+        }
 
         new N2ElementHidden($settings, 'slide', n2_('Slide'), 'W10=', array(
             'rowClass' => 'n2-hidden'

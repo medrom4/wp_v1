@@ -43,7 +43,9 @@ class N2SSPluginItemFactoryYouTube extends N2SSPluginItemFactoryAbstract {
         return dirname(__FILE__) . DIRECTORY_SEPARATOR . $this->type . DIRECTORY_SEPARATOR;
     }
 
-    public static function getFilled($slide, $data) {
+    public function getFilled($slide, $data) {
+        $data = parent::getFilled($slide, $data);
+
         $data->set('image', $slide->fill($data->get('image', '')));
         $data->set('youtubeurl', $slide->fill($data->get('youtubeurl', '')));
 
@@ -51,10 +53,14 @@ class N2SSPluginItemFactoryYouTube extends N2SSPluginItemFactoryAbstract {
     }
 
     public function prepareExport($export, $data) {
+        parent::prepareExport($export, $data);
+
         $export->addImage($data->get('image'));
     }
 
     public function prepareImport($import, $data) {
+        $data = parent::prepareImport($import, $data);
+
         $data->set('image', $import->fixImage($data->get('image')));
 
         return $data;

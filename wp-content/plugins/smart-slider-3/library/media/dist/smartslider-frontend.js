@@ -548,6 +548,12 @@ N2D('SmartSliderAbstract', function ($, undefined) {
                 this.sliderElement.closest('.n2-ss-align').remove();
             }, this));
         }
+
+        /**
+         * If the killed slider has a dependency we force them to show
+         */
+        n2ss.makeReady(this.id, this);
+        this.readyDeferred.resolve();
     };
 
     SmartSliderAbstract.prototype.waitForExists = function (id, parameters) {

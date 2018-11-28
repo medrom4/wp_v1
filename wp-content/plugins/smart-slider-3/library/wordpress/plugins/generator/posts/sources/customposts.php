@@ -104,6 +104,10 @@ class N2GeneratorPostsCustomPosts extends N2GeneratorAbstract {
         $status = new N2ElementGroup($filter, 'poststatusgroup', n2_('Post status'));
 
         $statuses = get_post_stati();
+        $statuses += array(
+            'any'   => 'any',
+            'unset' => 'unset',
+        );
 
         new N2ElementList($status, 'poststatus', n2_('Post status'), 'publish', array(
             'options' => $statuses

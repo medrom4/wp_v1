@@ -15,6 +15,9 @@ class SmartSlider3 {
         if (get_option("n2_ss3_version") != N2SS3::$completeVersion) {
             self::install();
         }
+        require_once dirname(__FILE__) . '/blackfriday.php';
+    
+    
 
         add_action('widgets_init', 'SmartSlider3::widgets_init', 11);
         add_action('widgets_admin_page', 'SmartSlider3::widgets_admin_page');

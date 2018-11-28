@@ -3583,7 +3583,7 @@ N2D('EditorSlide', ['EditorAbstract'], function ($, undefined) {
             '#slidebackgroundVideoMp4',
             '#slidebackgroundColor',
             '#slidebackgroundColorEnd',
-            '#linkslidelink-1',
+            '#slidehref',
             '#layergenerator-visible',
             '#layergroup-generator-visible'
         ]);
@@ -11118,7 +11118,8 @@ N2D('Col', ['ContentAbstract'], function ($, undefined) {
         N2Classes.ContentAbstract.prototype.addProperties.call(this, $layer);
 
         this.createProperty('colwidth', '1', $layer);
-        this.createProperty('link', '#|*|_self', $layer);
+        this.createProperty('href', '', $layer);
+        this.createProperty('href-target', '_self', $layer);
 
         this.createAdvancedProperty(new N2Classes.LayerAdvancedProperty('borderradius', 0, {
             "-hover": undefined
@@ -11247,8 +11248,9 @@ N2D('Col', ['ContentAbstract'], function ($, undefined) {
         return this.widthPercentage;
     };
 
-    Col.prototype._synclink = function () {
-    };
+    Col.prototype._synchref =
+        Col.prototype['_synchref-target'] = function () {
+        };
 
     Col.prototype._syncborderradius =
         Col.prototype['_syncborderradius-hover'] = function () {
@@ -14017,7 +14019,8 @@ N2D('Row', ['LayerContainer', 'ComponentAbstract'], function ($, undefined) {
         N2Classes.ComponentAbstract.prototype.addProperties.call(this, $layer);
 
 
-        this.createProperty('link', '#|*|_self', $layer);
+        this.createProperty('href', '', $layer);
+        this.createProperty('href-target', '_self', $layer);
 
         this.createProperty('bgimage', '', $layer);
         this.createProperty('bgimagex', 50, $layer);
@@ -14641,8 +14644,9 @@ N2D('Row', ['LayerContainer', 'ComponentAbstract'], function ($, undefined) {
         return '';
     };
 
-    Row.prototype._synclink = function () {
-    };
+    Row.prototype._synchref =
+        Row.prototype['_synchref-target'] = function () {
+        };
 
     Row.prototype._syncbgimage =
         Row.prototype._syncbgimagex =
@@ -15113,7 +15117,8 @@ N2D('ComponentSettings', function ($, undefined) {
             stretch: $('#layerrow-stretch'),
             wrapafter: $('#layerrow-wrap-after'),
             inneralign: $('#layerrow-inneralign'),
-            link: $('#layerrow-link'),
+            href: $('#layerrow-href'),
+            'href-target': $('#layerrow-href-target'),
             bgimage: $('#layerrow-background-image'),
             bgimagex: $('#layerrow-background-focus-x'),
             bgimagey: $('#layerrow-background-focus-y'),
@@ -15126,6 +15131,7 @@ N2D('ComponentSettings', function ($, undefined) {
             boxshadow: $('#layerrow-boxshadow'),
             opened: $('#layerrow-opened')
         };
+        fragmentEditor.editor.generator.registerField(this.forms.component.row.href);
         fragmentEditor.editor.generator.registerField(this.forms.component.row.bgimage);
 
         this.forms.component.col = {
@@ -15133,7 +15139,8 @@ N2D('ComponentSettings', function ($, undefined) {
             padding: $('#layercol-padding'),
             inneralign: $('#layercol-inneralign'),
             verticalalign: $('#layercol-verticalalign'),
-            link: $('#layercol-link'),
+            href: $('#layercol-href'),
+            'href-target': $('#layercol-href-target'),
             bgimage: $('#layercol-background-image'),
             bgimagex: $('#layercol-background-focus-x'),
             bgimagey: $('#layercol-background-focus-y'),
@@ -15151,7 +15158,7 @@ N2D('ComponentSettings', function ($, undefined) {
             colwidth: $('#layercol-colwidth'),
             order: $('#layercol-order')
         };
-        fragmentEditor.editor.generator.registerField($('#col-linklayerlink-1'));
+        fragmentEditor.editor.generator.registerField(this.forms.component.col.href);
         fragmentEditor.editor.generator.registerField(this.forms.component.col.bgimage);
     }
 
@@ -16788,7 +16795,7 @@ N2D('ItemButton', ['Item'], function ($, undefined) {
         this.addedFont('link', 'font');
         this.addedStyle('button', 'style');
 
-        this.generator.registerFields(['#item_buttoncontent', '#linkitem_buttonlink-1', '#item_buttonclass']);
+        this.generator.registerFields(['#item_buttoncontent', '#item_buttonhref', '#item_buttonclass']);
     };
 
     ItemButton.prototype.getName = function (data) {
@@ -16796,10 +16803,6 @@ N2D('ItemButton', ['Item'], function ($, undefined) {
     };
 
     ItemButton.prototype.parseAll = function (data) {
-        var link = data.link.split('|*|');
-        data.url = link[0];
-        data.target = link[1];
-        delete data.link;
 
         data.classes = '';
 
@@ -16845,7 +16848,7 @@ N2D('ItemHeading', ['Item'], function ($, undefined) {
 
     ItemHeading.prototype.getDefault = function () {
         return {
-            link: '#|*|_self',
+            href: '',
             font: '',
             style: ''
         }
@@ -16857,7 +16860,7 @@ N2D('ItemHeading', ['Item'], function ($, undefined) {
         this.addedFont('hover', 'font');
         this.addedStyle('heading', 'style');
 
-        this.generator.registerFields(['#item_headingheading', '#linkitem_headinglink-1', '#item_headingclass']);
+        this.generator.registerFields(['#item_headingheading', '#item_headinghref', '#item_headingclass']);
     };
 
     ItemHeading.prototype.getName = function (data) {
@@ -16866,12 +16869,6 @@ N2D('ItemHeading', ['Item'], function ($, undefined) {
 
     ItemHeading.prototype.parseAll = function (data) {
         data.uid = $.fn.uid();
-
-        var link = data.link.split('|*|');
-        data.url = link[0];
-        data.target = link[1];
-        delete data.link;
-
 
         if (parseInt(data.fullwidth)) {
             data.display = 'block';
@@ -16888,7 +16885,7 @@ N2D('ItemHeading', ['Item'], function ($, undefined) {
 
         N2Classes.Item.prototype.parseAll.apply(this, arguments);
 
-        if (data['url'] == '#' || data['url'] == '') {
+        if (data['href'] == '#' || data['href'] == '') {
             data['afontclass'] = '';
             data['astyleclass'] = '';
         } else {
@@ -16907,7 +16904,7 @@ N2D('ItemHeading', ['Item'], function ($, undefined) {
                     display: data.display
                 }).appendTo($node);
 
-        if (data['url'] == '#' || data['url'] == '') {
+        if (data['href'] == '#' || data['href'] == '') {
             $heading.html(data.heading);
         } else {
             $heading.append($('<a style="display:' + data.display + ';" href="#" class="' + data.afontclass + ' ' + data.astyleclass + ' n2-ow" onclick="return false;">' + data.heading + '</a>'));
@@ -16940,7 +16937,7 @@ N2D('ItemImage', ['Item'], function ($, undefined) {
     ItemImage.prototype.getDefault = function () {
         return {
             size: 'auto|*|auto',
-            link: '#|*|_self',
+            href: '',
             style: ''
         }
     };
@@ -16948,7 +16945,7 @@ N2D('ItemImage', ['Item'], function ($, undefined) {
     ItemImage.prototype.added = function () {
         this.needFill = ['image', 'cssclass'];
 
-        this.generator.registerFields(['#item_imageimage', '#item_imagealt', '#item_imagetitle', '#linkitem_imagelink-1', '#item_imagecssclass']);
+        this.generator.registerFields(['#item_imageimage', '#item_imagealt', '#item_imagetitle', '#item_imagehref', '#item_imagecssclass']);
     };
 
     ItemImage.prototype.getName = function (data) {
@@ -16960,11 +16957,6 @@ N2D('ItemImage', ['Item'], function ($, undefined) {
         data.width = size[0];
         data.height = size[1];
         delete data.size;
-
-        var link = data.link.split('|*|');
-        data.url = link[0];
-        data.target = link[1];
-        delete data.link;
 
         N2Classes.Item.prototype.parseAll.apply(this, arguments);
 
@@ -16993,7 +16985,7 @@ N2D('ItemImage', ['Item'], function ($, undefined) {
         var $node = $('<div class="' + data.styleclass + ' n2-ss-img-wrapper n2-ow" style="overflow:hidden"></div>'),
             $a = $node;
 
-        if (data['url'] != '#' && data['url'] != '') {
+        if (data['href'] != '#' && data['href'] != '') {
             $a = $('<a href="#" class="n2-ow" onclick="return false;" style="display: block;background: none !important;"></a>').appendTo($node);
         }
 
