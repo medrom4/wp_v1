@@ -22,7 +22,7 @@
 <?php endif;  ?>	
 
 <?php 
-	get_template_part('sections/specia','header_dark'); 
+	get_template_part('sections/specia','header_dark');
 	get_template_part('sections/specia','navigation');  
 ?>
 
