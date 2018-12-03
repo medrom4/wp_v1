@@ -75,5 +75,5 @@
 	</section>
 
 	<div class="clearfix"></div>
-
+ 
 <?php } wp_reset_postdata(); endif; ?>
