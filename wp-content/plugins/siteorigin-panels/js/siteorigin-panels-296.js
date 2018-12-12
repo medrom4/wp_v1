@@ -1,4 +1,4 @@
-(function e(t,n,r){function s(o,u){if(!n[o]){if(!t[o]){var a=typeof require=="function"&&require;if(!u&&a)return a(o,!0);if(i)return i(o,!0);var f=new Error("Cannot find module '"+o+"'");throw f.code="MODULE_NOT_FOUND",f}var l=n[o]={exports:{}};t[o][0].call(l.exports,function(e){var n=t[o][1][e];return s(n?n:e)},l,l.exports,e,t,n,r)}return n[o].exports}var i=typeof require=="function"&&require;for(var o=0;o<r.length;o++)s(r[o]);return s})({1:[function(require,module,exports){
+(function(){function r(e,n,t){function o(i,f){if(!n[i]){if(!e[i]){var c="function"==typeof require&&require;if(!f&&c)return c(i,!0);if(u)return u(i,!0);var a=new Error("Cannot find module '"+i+"'");throw a.code="MODULE_NOT_FOUND",a}var p=n[i]={exports:{}};e[i][0].call(p.exports,function(r){var n=e[i][1][r];return o(n||r)},p,p.exports,r,e,n,t)}return n[i].exports}for(var u="function"==typeof require&&require,i=0;i<t.length;i++)o(t[i]);return o}return r})()({1:[function(require,module,exports){
 var panels = window.panels;
 
 module.exports = Backbone.Collection.extend( {
@@ -4263,10 +4263,10 @@ module.exports = Backbone.View.extend( {
 			appendTo: '#wpwrap',
 			items: '.so-row-container',
 			handle: '.so-row-move',
-			// For Gutenberg, where it's possible to have multiple Page Builder blocks on a page.
-			// Also specify builderID when not in gutenberg to prevent being able to drop rows from builder in a dialog
+			// For the block editor, where it's possible to have multiple Page Builder blocks on a page.
+			// Also specify builderID when not in the block editor to prevent being able to drop rows from builder in a dialog
 			// into builder on the page under the dialog.
-			connectWith: '#' + builderID + '.so-rows-container,.gutenberg .so-rows-container',
+			connectWith: '#' + builderID + '.so-rows-container,.block-editor .so-rows-container',
 			axis: 'y',
 			tolerance: 'pointer',
 			scroll: false,
@@ -4781,33 +4781,8 @@ module.exports = Backbone.View.extend( {
 	activateContextMenu: function ( e, menu ) {
 		var builder = this;
 		
-		// Of all the visible builders, find the topmost
-		var topmostBuilder = $( '.siteorigin-panels-builder:visible' )
-		.sort( function ( a, b ) {
-			return $( a ).zIndex() > $( b ).zIndex() ? 1 : -1;
-		} )
-		.last();
-		
-		var topmostDialog = $( '.so-panels-dialog-wrapper:visible' )
-		.sort( function ( a, b ) {
-			return $( a ).zIndex() > $( b ).zIndex() ? 1 : -1;
-		} )
-		.last();
-		
-		var closestDialog = builder.$el.closest( '.so-panels-dialog-wrapper' );
-		
-		// Only run this if its element is the topmost builder, in the topmost dialog
-		if (
-			(
-				builder.$el.is( topmostBuilder ) ||
-				builder.$el.parent().is( '.siteorigin-panels-layout-block-container' ) // Gutenberg builder
-			)
-				&&
-			(
-				topmostDialog.length === 0 ||
-				topmostDialog.is( closestDialog )
-			)
-		) {
+		// Only run this if the event target is a descendant of this builder's DOM element.
+		if ( $.contains( builder.$el.get( 0 ), e.target ) ) {
 			// Get the element we're currently hovering over
 			var over = $( [] )
 			.add( builder.$( '.so-panels-welcome-message:visible' ) )
@@ -4820,7 +4795,7 @@ module.exports = Backbone.View.extend( {
 			
 			var activeView = over.last().data( 'view' );
 			if ( activeView !== undefined && activeView.buildContextualMenu !== undefined ) {
-				// We'll pass this to the current active view so it can popular the contextual menu
+				// We'll pass this to the current active view so it can populate the contextual menu
 				activeView.buildContextualMenu( e, menu );
 			}
 			else if ( over.last().hasClass( 'so-panels-welcome-message' ) ) {
@@ -4933,7 +4908,7 @@ module.exports = Backbone.View.extend( {
 		// Create a widget sortable that's connected with all other cells
 		this.widgetSortable = this.$( '.widgets-container' ).sortable( {
 			placeholder: "so-widget-sortable-highlight",
-			connectWith: '#' + builderID + ' .so-cells .cell .widgets-container,.gutenberg .so-cells .cell .widgets-container',
+			connectWith: '#' + builderID + ' .so-cells .cell .widgets-container,.block-editor .so-cells .cell .widgets-container',
 			tolerance: 'pointer',
 			scroll: false,
 			over: function ( e, ui ) {

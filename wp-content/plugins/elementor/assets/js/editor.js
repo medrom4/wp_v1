@@ -1,4 +1,4 @@
-/*! elementor - v2.3.4 - 29-11-2018 */
+/*! elementor - v2.3.5 - 11-12-2018 */
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -12612,6 +12612,9 @@ ColumnView = BaseElementView.extend({
 			onDropping: function onDropping(side, event) {
 				event.stopPropagation();
 
+				// Triggering drag end manually, since it won't fired above iframe
+				elementor.getPreviewView().onPanelElementDragEnd();
+
 				var newIndex = jQuery(this).index();
 
 				if ('bottom' === side) {
@@ -18399,10 +18402,15 @@ BaseSectionsContainerView = BaseContainer.extend({
 	},
 
 	onPanelElementDragStart: function onPanelElementDragStart() {
+		// A temporary workaround in order to fix Chrome's 70+ dragging above nested iframe bug
+		this.$el.find('.elementor-background-video-embed').hide();
+
 		elementor.helpers.disableElementEvents(this.$el.find('iframe'));
 	},
 
 	onPanelElementDragEnd: function onPanelElementDragEnd() {
+		this.$el.find('.elementor-background-video-embed').show();
+
 		elementor.helpers.enableElementEvents(this.$el.find('iframe'));
 	}
 });

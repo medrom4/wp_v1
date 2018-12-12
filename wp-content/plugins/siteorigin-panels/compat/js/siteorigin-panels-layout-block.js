@@ -9,9 +9,9 @@
 	var __ = i18n.__;
 	
 	blocks.registerBlockType( 'siteorigin-panels/layout-block', {
-		title: __( 'SiteOrigin Layout (in beta)' ),
+		title: __( 'SiteOrigin Layout', 'siteorigin-panels' ),
 		
-		description: __( "Build a layout using SiteOrigin's Page Builder." ),
+		description: __( "Build a layout using SiteOrigin's Page Builder.", 'siteorigin-panels' ),
 		
 		icon: function() {
 			return el(
@@ -35,29 +35,15 @@
 		},
 		
 		edit: withState( {
-			editing: true,
+			editing: false,
 			panelsInitialized: false,
 			loadingPreview: false,
+			previewInitialized: false,
 			previewHtml: ''
 		} )( function ( props ) {
-			var editing = props.editing;
-			var loadingPreview = props.loadingPreview;
-			function fetchPreview() {
-				if ( props.attributes.panelsData ) {
-					$.post( soPanelsGutenbergAdmin.previewUrl, {
-						action: 'so_panels_gutenberg_preview',
-						panelsData:  JSON.stringify( props.attributes.panelsData ),
-					} ).then( function( result ) {
-						if ( result.html ) {
-							props.setState( { previewHtml: result.html, loadingPreview: false } );
-						}
-					});
-					props.setState( { editing: false, loadingPreview: true } );
-				}
-			}
 			
 			function setupPreview() {
-				if ( ! editing ) {
+				if ( ! props.editing ) {
 					$( document ).trigger( 'panels_setup_preview' );
 					if ( window.sowb ) {
 						$ ( window.sowb ).trigger( 'setup_widgets' );
@@ -65,8 +51,14 @@
 				}
 			}
 			
-			function showEdit() {
+			function switchToEditing() {
 				props.setState( { editing: true, panelsInitialized: false } );
+			}
+			
+			function switchToPreview() {
+				if ( props.attributes.panelsData ) {
+					props.setState( { editing: false, previewInitialized: false } );
+				}
 			}
 			
 			function setupPanels( panelsContainer ) {
@@ -87,7 +79,7 @@
 					// Make sure panelsData is defined and clone so that we don't alter the underlying attribute.
 					var panelsData = JSON.parse( JSON.stringify( $.extend( {}, props.attributes.panelsData ) ) );
 					
-					// Disable Gutenberg block selection while dragging rows or widgets.
+					// Disable block selection while dragging rows or widgets.
 					function disableSelection() {
 						props.toggleSelection( false );
 						$( document ).on( 'mouseup', function enableSelection() {
@@ -119,14 +111,15 @@
 					
 					builderView.on( 'content_change', function () {
 						props.setAttributes( { panelsData: builderView.getData() } );
+						props.setState( { previewInitialized: false, previewHtml: '' } );
 					} );
 					
 					$( document ).trigger( 'panels_setup', builderView );
 					
-					props.setState( { panelsInitialized: true } );
+					props.setState( { editing: true, panelsInitialized: true } );
 				}
 			}
-			if ( editing ) {
+			if ( props.editing || ! props.attributes.panelsData ) {
 				return [
 					el(
 						BlockControls,
@@ -138,8 +131,8 @@
 								IconButton,
 								{
 									className: 'components-icon-button components-toolbar__control',
-									label: __( 'Preview layout.' ),
-									onClick: fetchPreview,
+									label: __( 'Preview layout.', 'siteorigin-panels' ),
+									onClick: switchToPreview,
 									icon: 'visibility'
 								}
 							)
@@ -152,7 +145,24 @@
 					} )
 				];
 			} else {
-				var preview = props.previewHtml;
+				
+				var loadingPreview = !props.editing && !props.previewHtml && props.attributes.panelsData;
+				if ( loadingPreview ) {
+					$.post( {
+						url: soPanelsBlockEditorAdmin.previewUrl,
+						data: {
+							action: 'so_panels_block_editor_preview',
+							panelsData: JSON.stringify( props.attributes.panelsData ),
+						}
+					} )
+					.then( function ( preview ) {
+						props.setState( {
+							previewHtml: preview,
+							loadingPreview: false,
+						} );
+					} );
+				}
+				var preview = props.previewHtml ? props.previewHtml : '';
 				return [
 					el(
 						BlockControls,
@@ -164,8 +174,8 @@
 								IconButton,
 								{
 									className: 'components-icon-button components-toolbar__control',
-									label: __( 'Edit layout.' ),
-									onClick: showEdit,
+									label: __( 'Edit layout.', 'siteorigin-panels' ),
+									onClick: switchToEditing,
 									icon: 'edit'
 								}
 							)

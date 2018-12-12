@@ -1,4 +1,4 @@
-/*! elementor - v2.3.4 - 29-11-2018 */
+/*! elementor - v2.3.5 - 11-12-2018 */
 /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
 /******/ 	var installedModules = {};
@@ -82,7 +82,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 181);
+/******/ 	return __webpack_require__(__webpack_require__.s = 182);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -396,7 +396,7 @@ module.exports = ViewModule.extend({
 
 /***/ }),
 
-/***/ 181:
+/***/ 182:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -417,10 +417,10 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 	var elements = {},
 	    EventManager = __webpack_require__(20),
 	    Module = __webpack_require__(7),
-	    ElementsHandler = __webpack_require__(182),
-	    YouTubeModule = __webpack_require__(194),
-	    AnchorsModule = __webpack_require__(195),
-	    LightboxModule = __webpack_require__(196);
+	    ElementsHandler = __webpack_require__(183),
+	    YouTubeModule = __webpack_require__(195),
+	    AnchorsModule = __webpack_require__(196),
+	    LightboxModule = __webpack_require__(197);
 
 	var ElementorFrontend = function ElementorFrontend() {
 		var self = this,
@@ -470,7 +470,7 @@ function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { de
 					Module: __webpack_require__(0),
 					ViewModule: __webpack_require__(1)
 				},
-				StretchElement: __webpack_require__(197),
+				StretchElement: __webpack_require__(198),
 				Masonry: __webpack_require__(17)
 			};
 
@@ -668,7 +668,7 @@ if (!elementorFrontend.isEditMode()) {
 
 /***/ }),
 
-/***/ 182:
+/***/ 183:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -682,22 +682,22 @@ ElementsHandler = function ElementsHandler($) {
 	// element-type.skin-type
 	var handlers = {
 		// Elements
-		section: __webpack_require__(183),
+		section: __webpack_require__(184),
 
 		// Widgets
-		'accordion.default': __webpack_require__(184),
-		'alert.default': __webpack_require__(185),
-		'counter.default': __webpack_require__(186),
-		'progress.default': __webpack_require__(187),
-		'tabs.default': __webpack_require__(188),
-		'toggle.default': __webpack_require__(189),
-		'video.default': __webpack_require__(190),
-		'image-carousel.default': __webpack_require__(191),
-		'text-editor.default': __webpack_require__(192)
+		'accordion.default': __webpack_require__(185),
+		'alert.default': __webpack_require__(186),
+		'counter.default': __webpack_require__(187),
+		'progress.default': __webpack_require__(188),
+		'tabs.default': __webpack_require__(189),
+		'toggle.default': __webpack_require__(190),
+		'video.default': __webpack_require__(191),
+		'image-carousel.default': __webpack_require__(192),
+		'text-editor.default': __webpack_require__(193)
 	};
 
 	var addGlobalHandlers = function addGlobalHandlers() {
-		elementorFrontend.hooks.addAction('frontend/element_ready/global', __webpack_require__(193));
+		elementorFrontend.hooks.addAction('frontend/element_ready/global', __webpack_require__(194));
 	};
 
 	var addElementsHandlers = function addElementsHandlers() {
@@ -771,7 +771,7 @@ module.exports = ElementsHandler;
 
 /***/ }),
 
-/***/ 183:
+/***/ 184:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1151,7 +1151,7 @@ module.exports = function ($scope) {
 
 /***/ }),
 
-/***/ 184:
+/***/ 185:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1169,7 +1169,7 @@ module.exports = function ($scope) {
 
 /***/ }),
 
-/***/ 185:
+/***/ 186:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1183,7 +1183,7 @@ module.exports = function ($scope, $) {
 
 /***/ }),
 
-/***/ 186:
+/***/ 187:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1206,7 +1206,7 @@ module.exports = function ($scope, $) {
 
 /***/ }),
 
-/***/ 187:
+/***/ 188:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1222,7 +1222,7 @@ module.exports = function ($scope, $) {
 
 /***/ }),
 
-/***/ 188:
+/***/ 189:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1239,7 +1239,7 @@ module.exports = function ($scope) {
 
 /***/ }),
 
-/***/ 189:
+/***/ 190:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1259,7 +1259,7 @@ module.exports = function ($scope) {
 
 /***/ }),
 
-/***/ 190:
+/***/ 191:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1359,7 +1359,7 @@ module.exports = function ($scope) {
 
 /***/ }),
 
-/***/ 191:
+/***/ 192:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1435,7 +1435,7 @@ module.exports = function ($scope) {
 
 /***/ }),
 
-/***/ 192:
+/***/ 193:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1545,7 +1545,7 @@ module.exports = function ($scope) {
 
 /***/ }),
 
-/***/ 193:
+/***/ 194:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1601,7 +1601,7 @@ module.exports = function ($scope) {
 
 /***/ }),
 
-/***/ 194:
+/***/ 195:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1658,7 +1658,7 @@ module.exports = ViewModule.extend({
 
 /***/ }),
 
-/***/ 195:
+/***/ 196:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -1742,7 +1742,7 @@ module.exports = ViewModule.extend({
 
 /***/ }),
 
-/***/ 196:
+/***/ 197:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -2208,7 +2208,7 @@ module.exports = LightboxModule;
 
 /***/ }),
 
-/***/ 197:
+/***/ 198:
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";

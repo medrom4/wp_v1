@@ -871,12 +871,12 @@
   width: 12px;
   height: 50px;
   display: block;
-  background: url(images/dialog-separator.png) no-repeat;
+  background: url(./images/dialog-separator.png) no-repeat;
 }
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .so-panels-dialog .so-title-bar h3.so-parent-link .so-separator,
   .block-editor .so-title-bar h3.so-parent-link .so-separator {
-    background: url(images/dialog-separator@2x.png) no-repeat;
+    background: url(./images/dialog-separator@2x.png) no-repeat;
     background-size: cover;
   }
 }
@@ -2538,7 +2538,7 @@
   height: 6px;
   position: absolute;
   z-index: 12;
-  background: url("images/dropdown-pointer.png");
+  background: url("./images/dropdown-pointer.png");
   background-size: 12px 6px;
   top: 1px;
   right: 18px;

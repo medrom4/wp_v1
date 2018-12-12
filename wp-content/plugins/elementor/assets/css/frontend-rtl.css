@@ -1,4 +1,4 @@
-/*! elementor - v2.3.4 - 29-11-2018 */
+/*! elementor - v2.3.5 - 11-12-2018 */
 .dialog-widget-content {
   background-color: #fff;
   position: absolute;
@@ -2757,7 +2757,9 @@ body.elementor-page .elementor-widget-menu-anchor {
     padding: 12px 10px; } }
 
 .elementor-widget-video .elementor-widget-container {
-  overflow: hidden; }
+  overflow: hidden;
+  -webkit-transform: translate3d(0, 0, 0);
+          transform: translate3d(0, 0, 0); }
 
 .elementor-widget-video .elementor-open-inline .elementor-custom-embed-image-overlay {
   position: absolute;

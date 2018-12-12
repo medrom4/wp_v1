@@ -2157,7 +2157,8 @@ body.elementor-page .elementor-widget-menu-anchor {
     padding: 12px 10px; } }
 
 .elementor-widget-video .elementor-widget-container {
-  overflow: hidden; }
+  overflow: hidden;
+  transform: translate3d(0, 0, 0); }
 
 .elementor-widget-video .elementor-open-inline .elementor-custom-embed-image-overlay {
   position: absolute;

@@ -54,7 +54,7 @@ class SiteOrigin_Panels_Admin {
 		add_action( 'wp_ajax_so_panels_builder_content', array( $this, 'action_builder_content' ) );
 		add_action( 'wp_ajax_so_panels_widget_form', array( $this, 'action_widget_form' ) );
 		add_action( 'wp_ajax_so_panels_live_editor_preview', array( $this, 'action_live_editor_preview' ) );
-		add_action( 'wp_ajax_so_panels_gutenberg_preview', array( $this, 'gutenberg_preview' ) );
+		add_action( 'wp_ajax_so_panels_block_editor_preview', array( $this, 'block_editor_preview' ) );
 
 		// Initialize the additional admin classes.
 		SiteOrigin_Panels_Admin_Widget_Dialog::single();
@@ -65,14 +65,23 @@ class SiteOrigin_Panels_Admin {
 		SiteOrigin_Panels_Admin_Dashboard::single();
 
 		$this->in_save_post = false;
-
-
-        // Enqueue Yoast compatibility
-        add_action( 'admin_print_scripts-post-new.php', array( $this, 'enqueue_yoast_compat' ), 100 );
-        add_action( 'admin_print_scripts-post.php', array( $this, 'enqueue_yoast_compat' ), 100 );
-
-		add_filter( 'gutenberg_can_edit_post_type', array( $this, 'disable_gutenberg_for_panels_posts' ), 10, 2 );
-		add_filter( 'filter_gutenberg_meta_boxes', array( $this, 'disable_panels_for_gutenberg_posts' ) );
+		
+		
+		// Enqueue Yoast compatibility
+		add_action( 'admin_print_scripts-post-new.php', array( $this, 'enqueue_yoast_compat' ), 100 );
+		add_action( 'admin_print_scripts-post.php', array( $this, 'enqueue_yoast_compat' ), 100 );
+		
+		// Block editor specific actions
+		if ( function_exists( 'register_block_type' ) ) {
+			add_action( 'admin_notices', array( $this, 'admin_notices' ) );
+			add_filter( 'gutenberg_can_edit_post_type', array( $this, 'show_classic_editor_for_panels' ), 10, 2 );
+			add_filter( 'use_block_editor_for_post_type', array( $this, 'show_classic_editor_for_panels' ), 10, 2 );
+			// If Gutenberg is active, it will already add the Classic Editor dropdown item.
+			if ( ! function_exists( 'gutenberg_init' ) ) {
+				add_action( 'admin_print_scripts-edit.php', array( $this, 'add_panels_add_new_button' ) );
+			}
+			add_filter( 'display_post_states', array( $this, 'add_panels_post_state' ), 10, 2 );
+		}
 	}
 
 	/**
@@ -138,6 +147,7 @@ class SiteOrigin_Panels_Admin {
 	 * Callback to register the Page Builder Metaboxes
 	 */
 	function add_meta_boxes() {
+		
 		foreach ( siteorigin_panels_setting( 'post-types' ) as $type ) {
 			add_meta_box(
 				'so-panels-panels',
@@ -145,7 +155,13 @@ class SiteOrigin_Panels_Admin {
 				array( $this, 'render_meta_boxes' ),
 				( string ) $type,
 				'advanced',
-				'high'
+				'high',
+				array(
+					// Ideally when we have panels data for a page we would set this to false and it would cause the
+					// editor to fall back to classic editor, but that's not the case so we just declare it as a `__back_compat_meta_box`.
+					'__back_compat_meta_box' => true,
+					'__block_editor_compatible_meta_box' => false,
+				)
 			);
 		}
 	}
@@ -278,6 +294,8 @@ class SiteOrigin_Panels_Admin {
 			$text_widget = apply_filters( 'siteorigin_panels_text_widget_class', $text_widget );
 
 			$user = wp_get_current_user();
+			
+			$load_on_attach = siteorigin_panels_setting( 'load-on-attach' ) || isset( $_GET['siteorigin-page-builder'] );
 			wp_localize_script( 'so-panels-admin', 'panelsOptions', array(
 				'user'                      => ! empty( $user ) ? $user->ID : 0,
 				'ajaxurl'                   => wp_nonce_url( admin_url( 'admin-ajax.php' ), 'panels_action', '_panelsnonce' ),
@@ -441,7 +459,7 @@ class SiteOrigin_Panels_Admin {
 				),
 				'wpColorPickerOptions'      => apply_filters( 'siteorigin_panels_wpcolorpicker_options', array() ),
 				'prebuiltDefaultScreenshot' => siteorigin_panels_url( 'css/images/prebuilt-default.png' ),
-				'loadOnAttach'              => siteorigin_panels_setting( 'load-on-attach' ),
+				'loadOnAttach'              => $load_on_attach ,
 				'siteoriginWidgetRegex'     => str_replace( '*+', '*', get_shortcode_regex( array( 'siteorigin_widget' ) ) ),
 				'forms' 				=> array(
 					'loadingFailed' => __( 'Unknown error. Failed to load the form. Please check your internet connection, contact your web site administrator, or try again later.', 'siteorigin-panels' ),
@@ -573,8 +591,10 @@ class SiteOrigin_Panels_Admin {
 			$panels_data = apply_filters( 'siteorigin_panels_data', $panels_data, 'home' );
 		} else {
 			global $post;
-			$panels_data = get_post_meta( $post->ID, 'panels_data', true );
-			$panels_data = apply_filters( 'siteorigin_panels_data', $panels_data, $post->ID );
+			if ( ! empty( $post ) ) {
+				$panels_data = get_post_meta( $post->ID, 'panels_data', true );
+				$panels_data = apply_filters( 'siteorigin_panels_data', $panels_data, $post->ID );
+			}
 		}
 
 		if ( empty( $panels_data ) ) {
@@ -1068,11 +1088,11 @@ class SiteOrigin_Panels_Admin {
 	}
 
 	/**
-	 * Preview in the gutenberg editor.
+	 * Preview in the block editor.
 	 */
-	public function gutenberg_preview() {
+	public function block_editor_preview() {
 		
-		if ( empty( $_REQUEST['_panelsnonce'] ) || ! wp_verify_nonce( $_REQUEST['_panelsnonce'], 'gutenberg-preview' ) ) {
+		if ( empty( $_REQUEST['_panelsnonce'] ) || ! wp_verify_nonce( $_REQUEST['_panelsnonce'], 'block-editor-preview' ) ) {
 			wp_die();
 		}
 		
@@ -1095,7 +1115,8 @@ class SiteOrigin_Panels_Admin {
 			$rendered_layout .= ob_get_clean();
 		}
 		
-		wp_send_json( array( 'html' => $rendered_layout ) );
+		echo $rendered_layout;
+		wp_die();
 	}
 
 	/**
@@ -1192,46 +1213,222 @@ class SiteOrigin_Panels_Admin {
 		<?php
 	}
 	
+	public function admin_notices() {
+		$panels_data = $this->get_current_admin_panels_data();
+		
+		// This is for the Gutenberg plugin.
+		$is_block_editor = function_exists( 'is_gutenberg_page' ) && is_gutenberg_page();
+		// This is for WP 5 with the integrated block editor. Let it override the Gutenberg plugin.
+		$current_screen = get_current_screen();
+		if ( $current_screen && method_exists( $current_screen, 'is_block_editor' ) ) {
+			$is_block_editor = $current_screen->is_block_editor();
+		}
+		if ( $is_block_editor && ! empty( $panels_data ) ) {
+			$install_url = self_admin_url( 'plugin-install.php?tab=featured' );
+			$notice = sprintf( __( 'This page contains SiteOrigin Page Builder layout data. Please <a href="%s" class="components-notice__action is-link">install the Classic Editor plugin</a> to continue editing this layout.' ), $install_url );
+			?>
+			<div id="siteorigin-panels-notice" class="notice notice-warning is-dismissible"><p id="classic-editor-notice"><?php echo $notice ?></p></div>
+			<?php
+		}
+	}
+	
 	/**
-	 * Disable the Gutenberg editor for existing PB posts.
+	 * Show Classic Editor for existing PB posts.
 	 *
-	 * @param $can_edit
+	 * @param $use_block_editor
 	 * @param $post_type
 	 *
 	 * @return bool
 	 */
-	public function disable_gutenberg_for_panels_posts( $can_edit, $post_type ) {
+	public function show_classic_editor_for_panels( $use_block_editor, $post_type ) {
 		
-		if ( function_exists( 'get_current_screen' ) ) {
-			$screen = get_current_screen();
-			$panels_data = $screen->base == 'post' ? $this->get_current_admin_panels_data() : array();
-		} else {
-			// Fall back to just checking the global $post for 'panels_data' metadata.
-			global $post;
-			$panels_data = empty( $post ) ? array() : get_post_meta( $post->ID, 'panels_data', true );
+		// For new pages.
+		if ( isset( $_GET['block-editor'] ) ) {
+			return $use_block_editor;
+		} else if ( isset( $_GET['siteorigin-page-builder'] ) ) {
+			return false;
 		}
-		$post_types = siteorigin_panels_setting( 'post-types' );
-		$is_panels_page = in_array( $post_type, $post_types ) && ! empty( $panels_data );
 		
-		return empty( $is_panels_page ) && $can_edit;
+		// If the `$post_type` is set to be used by Page Builder.
+		$post_types = siteorigin_panels_setting( 'post-types' );
+		$is_panels_type = in_array( $post_type, $post_types );
+		
+		// For existing posts.
+		global $post;
+		if ( ! empty( $post ) ) {
+			// If the post has blocks just allow `$use_block_editor` to decide.
+			if ( ! has_blocks( $post ) ) {
+				$panels_data = get_post_meta( $post->ID, 'panels_data', true );
+				if ( ! empty( $panels_data ) || $is_panels_type ) {
+					$use_block_editor = false;
+				}
+			}
+		} else {
+			if ( $is_panels_type ){
+				$use_block_editor = false;
+			}
+		}
+		
+		return $use_block_editor;
 	}
 	
 	/**
-	 * Disable PB when we're in the Gutenberg editor.
+	 * This was copied from Gutenberg and slightly modified as a quick way to allow users to create new Page Builder pages
+	 * in the classic editor without requiring the classic editor plugin be installed.
 	 *
-	 * @param $wp_meta_boxes
 	 *
-	 * @return mixed
 	 */
-	public function disable_panels_for_gutenberg_posts( $wp_meta_boxes ) {
-		foreach ( $wp_meta_boxes as &$locations ) {
-			foreach ( $locations as &$priorities ) {
-				foreach ( $priorities as &$boxes ) {
-					unset( $boxes['so-panels-panels'] );
-
+	function add_panels_add_new_button() {
+		global $typenow;
+		
+		if ( 'wp_block' === $typenow ) {
+			?>
+			<style type="text/css">
+				.page-title-action {
+					display: none;
 				}
-			}
+			</style>
+			<?php
 		}
-		return $wp_meta_boxes;
+		
+		if ( ! in_array( $typenow, siteorigin_panels_setting( 'post-types' ) ) ||
+			 // WooCommerce product type doesn't support block editor...
+			 ( class_exists( 'WooCommerce' ) && $typenow == 'product' ) ) {
+			return;
+		}
+		
+		?>
+		<style type="text/css">
+			.split-page-title-action {
+				display: inline-block;
+			}
+			
+			.split-page-title-action a,
+			.split-page-title-action a:active,
+			.split-page-title-action .expander:after {
+				padding: 6px 10px;
+				position: relative;
+				top: -3px;
+				text-decoration: none;
+				border: 1px solid #ccc;
+				border-radius: 2px 0px 0px 2px;
+				background: #f7f7f7;
+				text-shadow: none;
+				font-weight: 600;
+				font-size: 13px;
+				line-height: normal; /* IE8-IE11 need this for buttons */
+				color: #0073aa; /* some of these controls are button elements and don't inherit from links */
+				cursor: pointer;
+				outline: 0;
+			}
+			
+			.split-page-title-action a:hover,
+			.split-page-title-action .expander:hover:after {
+				border-color: #008EC2;
+				background: #00a0d2;
+				color: #fff;
+			}
+			
+			.split-page-title-action a:focus,
+			.split-page-title-action .expander:focus:after {
+				border-color: #5b9dd9;
+				box-shadow: 0 0 2px rgba( 30, 140, 190, 0.8 );
+			}
+			
+			.split-page-title-action .expander:after {
+				content: "\f140";
+				font: 400 20px/.5 dashicons;
+				speak: none;
+				top: 0px;
+			<?php if ( is_rtl() ) : ?>
+				right: -1px;
+			<?php else : ?>
+				left: -1px;
+			<?php endif; ?>
+				position: relative;
+				vertical-align: top;
+				text-decoration: none !important;
+				padding: 4px 5px 5px 4px;
+				border-radius: 0px 2px 2px 0px;
+			}
+			
+			.split-page-title-action .dropdown {
+				display: none;
+			}
+			
+			.split-page-title-action .dropdown.visible {
+				display: block;
+				position: absolute;
+				margin-top: 3px;
+				z-index: 1;
+			}
+			
+			.split-page-title-action .dropdown.visible a {
+				display: block;
+				top: 0;
+				margin: -1px 0;
+			<?php if ( is_rtl() ) : ?>
+				padding-left: 9px;
+			<?php else : ?>
+				padding-right: 9px;
+			<?php endif; ?>
+			}
+			
+			.split-page-title-action .expander {
+				outline: none;
+			}
+		
+		</style>
+		<script type="text/javascript">
+			document.addEventListener( 'DOMContentLoaded', function() {
+				var buttons = document.getElementsByClassName( 'page-title-action' ),
+					button = buttons.item( 0 );
+				
+				if ( ! button ) {
+					return;
+				}
+				
+				var url = button.href;
+				var urlHasParams = ( -1 !== url.indexOf( '?' ) );
+				var panelsUrl = url + ( urlHasParams ? '&' : '?' ) + 'siteorigin-page-builder';
+				var blockEditorUrl = url + ( urlHasParams ? '&' : '?' ) + 'block-editor';
+				
+				var newbutton = '<span id="split-page-title-action" class="split-page-title-action">';
+				newbutton += '<a href="' + url + '">' + button.innerText + '</a>';
+				newbutton += '<span class="expander" tabindex="0" role="button" aria-haspopup="true" aria-label="<?php echo esc_attr( __( 'Toggle editor selection menu', 'siteorigin-panels' ) ); ?>"></span>';
+				newbutton += '<span class="dropdown"><a href="' + panelsUrl + '"><?php echo esc_html( __( 'SiteOrigin Page Builder', 'siteorigin-panels' ) ); ?></a>';
+				newbutton += '<a href="' + blockEditorUrl + '"><?php echo esc_html( __( 'Block Editor', 'siteorigin-panels' ) ); ?></a></span></span><span class="page-title-action" style="display:none;"></span>';
+				
+				button.insertAdjacentHTML( 'afterend', newbutton );
+				button.parentNode.removeChild( button );
+				
+				var expander = document.getElementById( 'split-page-title-action' ).getElementsByClassName( 'expander' ).item( 0 );
+				var dropdown = expander.parentNode.querySelector( '.dropdown' );
+				function toggleDropdown() {
+					dropdown.classList.toggle( 'visible' );
+				}
+				expander.addEventListener( 'click', function( e ) {
+					e.preventDefault();
+					toggleDropdown();
+				} );
+				expander.addEventListener( 'keydown', function( e ) {
+					if ( 13 === e.which || 32 === e.which ) {
+						e.preventDefault();
+						toggleDropdown();
+					}
+				} );
+			} );
+		</script>
+		<?php
+	}
+	
+	public function add_panels_post_state( $post_states, $post ) {
+		$panels_data = get_post_meta( $post->ID, 'panels_data', true );
+		
+		if ( ! empty( $panels_data ) ) {
+			$post_states[] = __( 'SiteOrigin Page Builder', 'siteorigin-panels' );
+		}
+		
+		return $post_states;
 	}
 }

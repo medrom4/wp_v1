@@ -405,7 +405,7 @@ msgstr ""
 msgid "Widgets Bundle Post Meta Data"
 msgstr ""
 
-#: base/inc/routes/siteorigin-widgets-resource.class.php:89
+#: base/inc/routes/siteorigin-widgets-resource.class.php:61
 msgstr ""
 
 #: base/inc/widgets/base-slider.class.php:54
@@ -572,15 +572,15 @@ msgstr ""
 msgid "Current Color"
 msgstr ""
 
-#: compat/block-editor/widget-block.php:39, compat/visual-composer/visual-composer.php:77
+#: compat/block-editor/widget-block.php:52, compat/visual-composer/visual-composer.php:77
 msgid "Selecting a different widget will revert any changes. Continue?"
 msgstr ""
 
-#: compat/block-editor/widget-block.php:52
+#: compat/block-editor/widget-block.php:68
 msgid "You need to select a widget type before you'll see anything here. :)"
 msgstr ""
 
-#: compat/block-editor/widget-block.php:73
+#: compat/block-editor/widget-block.php:91
 msgid "Invalid widget class %s. Please make sure the widget has been activated in %sSiteOrigin Widgets%s."
 msgstr ""
 
@@ -1981,11 +1981,11 @@ msgstr ""
 msgid "Enter your %sAPI key%s. Your map won't function correctly without one."
 msgstr ""
 
-#: widgets/google-map/google-map.php:552
+#: widgets/google-map/google-map.php:545
 msgid "There were no results for the place you entered. Please try another."
 msgstr ""
 
-#: widgets/google-map/google-map.php:605
+#: widgets/google-map/google-map.php:598
 msgid "Custom Map"
 msgstr ""
 
